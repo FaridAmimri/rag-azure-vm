@@ -141,7 +141,7 @@ def main():
     print(f"Index saved to {INDEX_DIR}/")
 
     # Quick sanity check: does retrieval return relevant files?
-    question = "My VM does not start after a resize"
+    question = "Creating a restore point fails, how can I fix it?"
     print(f"\nTest query: {question}")
     for doc in vectorstore.similarity_search(question, k=3):
         print(f"  - {doc.metadata['title']}  ({doc.metadata['source']})")

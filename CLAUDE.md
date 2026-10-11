@@ -5,7 +5,7 @@ Prepare project 7 of the OpenClassrooms AI Engineer program: design and deploy a
 Imposed stack: Python + LangChain + Mistral + Faiss. Expose results through an API, write tests.
 
 ## Stack
-- Python 3.12.10, venv in `.venv` (Windows, PowerShell, VS Code)
+- Python 3.12.10, venv in `.venv` (Windows, Git Bash, VS Code)
 - LangChain 1.4.4 (v1.x: avoid old 0.x imports like `langchain.chains`)
 - Mistral API: `mistral-embed` (embeddings, dimension 1024) + `mistral-small-latest` (chat)
 - Faiss (`faiss-cpu`), saved locally in `faiss_index/`
@@ -25,7 +25,7 @@ Develop on the small subset; index the full corpus only once the pipeline works.
 ## Status
 - [x] Setup: venv, libraries, requirements.txt, .env, .gitignore
 - [x] test_mistral.py works (chat OK, embedding dim 1024)
-- [ ] Step 7: ingest.py (load .md, split 1000/150, embed, FAISS.save_local), DEV_MODE flag
+- [x] Step 7: ingest.py (load .md, split 1000/150, embed, FAISS.save_local), DEV_MODE flag
 - [ ] Step 8: RAG chain (retriever + prompt + Mistral), answers with sources
 - [ ] Step 9: FastAPI `POST /ask`
 - [ ] Step 10: tests (pytest) + quality evaluation (reference Q&A set)
@@ -34,5 +34,5 @@ Develop on the small subset; index the full corpus only once the pipeline works.
 ## How to work with me
 - I'm new to Python (I know Node.js / JavaScript): explain each step briefly, with JS equivalents when useful.
 - Go step by step; make me run and verify each step before moving on.
-- Commands are for Windows PowerShell.
+- Commands are for Git Bash on Windows.
 - Reply in the language I write in (usually French).
