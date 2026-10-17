@@ -28,7 +28,7 @@ PROMPT = ChatPromptTemplate.from_messages([
     ("system",
      "You are an Azure Virtual Machines support assistant.\n"
      "Answer ONLY with the information in the context below.\n"
-          "If the context does not contain the answer, say exactly: "
+     "If the context does not contain the answer, say exactly: "
      f"\"{NO_ANSWER}\"\n"
      "Be concise and practical (steps, commands). "
      "Cite the sources you use with their number, like [1] or [2].\n\n"
