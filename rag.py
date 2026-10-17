@@ -22,13 +22,14 @@ EMBED_MODEL = "mistral-embed"        # must be the same model as in ingest.py
 CHAT_MODEL = "mistral-small-latest"
 TOP_K = 4                            # number of chunks given to the LLM
 TEMPERATURE = 0.0                    # 0 = stable answers, no creativity
+NO_ANSWER = "I don't know, the documentation I have does not cover this."
 
 PROMPT = ChatPromptTemplate.from_messages([
     ("system",
      "You are an Azure Virtual Machines support assistant.\n"
      "Answer ONLY with the information in the context below.\n"
-     "If the context does not contain the answer, say: "
-     "\"I don't know, the documentation I have does not cover this.\"\n"
+          "If the context does not contain the answer, say exactly: "
+     f"\"{NO_ANSWER}\"\n"
      "Be concise and practical (steps, commands). "
      "Cite the sources you use with their number, like [1] or [2].\n\n"
      "Context:\n{context}"),
@@ -105,6 +106,9 @@ def ask(question):
         "context": format_context(docs),
         "question": question,
     })
+        # No sources when the model says the docs don't cover the question
+    if answer.strip().startswith("I don't know"):
+        return {"answer": answer, "sources": []}
     return {"answer": answer, "sources": unique_sources(docs)}
 
 
