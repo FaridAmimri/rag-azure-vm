@@ -106,7 +106,7 @@ def ask(question):
         "context": format_context(docs),
         "question": question,
     })
-        # No sources when the model says the docs don't cover the question
+    # No sources when the model says the docs don't cover the question
     if answer.strip().startswith("I don't know"):
         return {"answer": answer, "sources": []}
     return {"answer": answer, "sources": unique_sources(docs)}
