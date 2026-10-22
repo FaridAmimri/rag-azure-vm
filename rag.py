@@ -5,6 +5,7 @@ Run (venv activated):  python rag.py "your question"
 Needs: faiss_index/ built by ingest.py, MISTRAL_API_KEY in .env
 """
 import os
+import re
 import sys
 from pathlib import Path
 
@@ -21,7 +22,7 @@ INDEX_DIR = Path("faiss_index")
 EMBED_MODEL = "mistral-embed"        # must be the same model as in ingest.py
 CHAT_MODEL = "mistral-small-latest"
 TOP_K = 4                            # number of chunks given to the LLM
-MAX_DISTANCE = None                  # drop chunks farther than this (None = keep all)
+MAX_DISTANCE = 0.45                  # drop chunks farther than this (None = keep all)
 TEMPERATURE = 0.0                    # 0 = stable answers, no creativity
 NO_ANSWER = "I don't know, the documentation I have does not cover this."
 
@@ -107,6 +108,15 @@ def unique_sources(docs):
     return sources
 
 
+def cited_docs(answer, docs):
+    """Chunks the answer cites as [1], [2] or [1, 3]; all chunks if it cites none."""
+    numbers = set()
+    for group in re.findall(r"\[([\d,\s]+)\]", answer):
+        numbers.update(int(n) for n in re.findall(r"\d+", group))
+    cited = [doc for i, doc in enumerate(docs, start=1) if i in numbers]
+    return cited or docs
+
+
 # ---------------------------------------------------------------------------
 # 3. Main function: question -> answer + sources (reused by the API in step 9)
 # ---------------------------------------------------------------------------
@@ -122,7 +132,7 @@ def ask(question):
     # No sources when the model says the docs don't cover the question
     if answer.strip().startswith("I don't know"):
         return {"answer": answer, "sources": []}
-    return {"answer": answer, "sources": unique_sources(docs)}
+    return {"answer": answer, "sources": unique_sources(cited_docs(answer, docs))}
 
 
 if __name__ == "__main__":

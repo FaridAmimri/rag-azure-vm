@@ -48,3 +48,15 @@ def test_ask_refuses_without_llm_when_nothing_is_close(monkeypatch):
     monkeypatch.setattr(rag, "get_components", lambda: (STORE, FakeChain()))
     result = rag.ask("What is the price of Azure SQL?")
     assert result == {"answer": rag.NO_ANSWER, "sources": []}
+
+
+DOCS = [make_doc("a.md"), make_doc("b.md"), make_doc("c.md")]
+
+
+def test_cited_docs_keeps_only_cited_chunks():
+    docs = rag.cited_docs("Check status.json [3]. Then restart [1, 3].", DOCS)
+    assert [d.metadata["source"] for d in docs] == ["a.md", "c.md"]
+
+
+def test_cited_docs_keeps_all_when_nothing_is_cited():
+    assert rag.cited_docs("Restart the VM.", DOCS) == DOCS
