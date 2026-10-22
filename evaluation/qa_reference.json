@@ -58,7 +58,7 @@
     "id": "msp-proxy-agent",
     "question": "With Metadata Security Protocol enabled, how do I check that the Guest Proxy Agent is running on a Windows VM?",
     "expected_sources": ["metadata-security-protocol/troubleshoot-guide.md"],
-    "keywords": ["guestproxyagent|proxy agent"]
+    "keywords": ["proxy agent|proxyagent"]
   },
   {
     "id": "out-of-scope-sql-price",
