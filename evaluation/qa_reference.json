@@ -1,0 +1,75 @@
+[
+  {
+    "id": "restore-point-sas",
+    "question": "How do I fix the DiskRestorePointUsedByCustomer error when I delete a restore point?",
+    "expected_sources": ["restore-point-troubleshooting.md"],
+    "keywords": ["shared access|sas"]
+  },
+  {
+    "id": "hibernate-check",
+    "question": "I can't hibernate my VM. What should I check first?",
+    "expected_sources": [
+      "hibernate-resume-troubleshooting.md",
+      "windows/hibernate-resume-troubleshooting-windows.md",
+      "linux/hibernate-resume-troubleshooting-linux.md"
+    ],
+    "keywords": ["enabled"]
+  },
+  {
+    "id": "cloud-init-timeout",
+    "question": "My Linux VM provisioning fails with OSProvisioningTimedOut when I use cloud-init custom data. How do I troubleshoot it?",
+    "expected_sources": ["linux/cloud-init-troubleshooting.md"],
+    "keywords": ["customdata|custom data", "log"]
+  },
+  {
+    "id": "extension-failed",
+    "question": "An extension failed on my Windows VM. What should I verify first?",
+    "expected_sources": [
+      "extensions/troubleshoot.md",
+      "includes/virtual-machines-common-extensions-troubleshoot.md"
+    ],
+    "keywords": ["agent"]
+  },
+  {
+    "id": "gallery-replication",
+    "question": "Image version replication to my target regions in Azure Compute Gallery is slow. How can I check its status?",
+    "expected_sources": ["troubleshooting-shared-images.md"],
+    "keywords": ["replicationstatus"]
+  },
+  {
+    "id": "xfs-duplicate-uuid",
+    "question": "Remounting an XFS data disk fails with a duplicate UUID error after per-disk resiliency reattached it. What should I do?",
+    "expected_sources": ["disks-per-disk-resiliency-troubleshoot.md"],
+    "keywords": ["nouuid"]
+  },
+  {
+    "id": "patching-after-move",
+    "question": "Scheduled patching with a maintenance configuration times out after I moved my VM to another region. Why?",
+    "expected_sources": ["troubleshoot-maintenance-configurations.md"],
+    "keywords": ["12 hours", "configuration"]
+  },
+  {
+    "id": "image-builder-identity",
+    "question": "Azure VM Image Builder says the assigned managed identity is not authorized to access a resource. How do I fix it?",
+    "expected_sources": ["linux/image-builder-troubleshoot.md"],
+    "keywords": ["permission|role"]
+  },
+  {
+    "id": "msp-proxy-agent",
+    "question": "With Metadata Security Protocol enabled, how do I check that the Guest Proxy Agent is running on a Windows VM?",
+    "expected_sources": ["metadata-security-protocol/troubleshoot-guide.md"],
+    "keywords": ["guestproxyagent|proxy agent"]
+  },
+  {
+    "id": "out-of-scope-sql-price",
+    "question": "What is the monthly price of an Azure SQL Database?",
+    "expected_sources": [],
+    "keywords": []
+  },
+  {
+    "id": "out-of-scope-aks-ingress",
+    "question": "How do I install an NGINX ingress controller on an AKS cluster?",
+    "expected_sources": [],
+    "keywords": []
+  }
+]
