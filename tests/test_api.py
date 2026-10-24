@@ -51,3 +51,23 @@ def test_ask_returns_answer_and_sources(client):
 def test_ask_rejects_invalid_question(client, payload):
     response = client.post("/ask", json=payload)
     assert response.status_code == 422
+
+
+def test_ask_requires_api_key_when_set(client, monkeypatch):
+    monkeypatch.setenv("API_KEY", "secret-test-key")
+    assert client.post("/ask", json={"question": "My VM agent is not ready"}).status_code == 401
+    wrong = client.post("/ask", json={"question": "My VM agent is not ready"},
+                        headers={"X-API-Key": "wrong"})
+    assert wrong.status_code == 401
+
+
+def test_ask_accepts_valid_api_key(client, monkeypatch):
+    monkeypatch.setenv("API_KEY", "secret-test-key")
+    response = client.post("/ask", json={"question": "My VM agent is not ready"},
+                           headers={"X-API-Key": "secret-test-key"})
+    assert response.status_code == 200
+
+
+def test_health_stays_public_with_api_key(client, monkeypatch):
+    monkeypatch.setenv("API_KEY", "secret-test-key")
+    assert client.get("/health").status_code == 200
