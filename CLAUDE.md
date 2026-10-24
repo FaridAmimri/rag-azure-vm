@@ -26,9 +26,9 @@ Develop on the small subset; index the full corpus only once the pipeline works.
 - [x] Setup: venv, libraries, requirements.txt, .env, .gitignore
 - [x] test_mistral.py works (chat OK, embedding dim 1024)
 - [x] Step 7: ingest.py (load .md, split 1000/150, embed, FAISS.save_local), DEV_MODE flag
-- [ ] Step 8: RAG chain (retriever + prompt + Mistral), answers with sources
+- [x] Step 8: RAG chain (retriever + prompt + Mistral), answers with sources
 - [x] Step 9: FastAPI `POST /ask`
-- [ ] Step 10: tests (pytest) + quality evaluation (reference Q&A set)
+- [x] Step 10: tests (pytest) + quality evaluation (reference Q&A set, 11/11, MAX_DISTANCE 0.45 to re-check on full corpus)
 - [ ] Step 11: Docker + deployment (Azure Container Apps or Hugging Face Spaces)
 
 ## How to work with me

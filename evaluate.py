@@ -2,16 +2,18 @@
 evaluate.py - Measure the quality of the RAG answers on a reference Q&A set.
 
 Run (venv activated):  python evaluate.py
+                       python evaluate.py --scores   (distances only, to choose MAX_DISTANCE)
 Input:  evaluation/qa_reference.json  (questions + expected sources + keywords)
 Output: evaluation/results.json       (detail per question + summary)
 
 Calls the real Mistral API: about 1 embedding + 1 chat call per question.
 """
 import json
+import sys
 import time
 from pathlib import Path
 
-from rag import ask
+from rag import ask, get_components, search
 
 REFERENCE_FILE = Path("evaluation/qa_reference.json")
 RESULTS_FILE = Path("evaluation/results.json")
@@ -108,5 +110,23 @@ def main():
     print(f"\nDetails saved to {RESULTS_FILE}")
 
 
+# ---------------------------------------------------------------------------
+# 3. Calibration: print the distance of each retrieved chunk (no chat call)
+# ---------------------------------------------------------------------------
+def show_scores():
+    """OK = expected file, -- = other file. Pick MAX_DISTANCE between the two groups."""
+    items = json.loads(REFERENCE_FILE.read_text(encoding="utf-8"))
+    vectorstore, _ = get_components()
+    for item in items:
+        print(f"\n{item['id']}")
+        for doc, distance in search(vectorstore, item["question"]):
+            mark = "OK" if doc.metadata["source"] in item["expected_sources"] else "--"
+            print(f"  {mark}  {distance:.3f}  {doc.metadata['source']}")
+
+
 if __name__ == "__main__":
-    main()
+    # sys.argv = command-line arguments, like process.argv in Node
+    if "--scores" in sys.argv:
+        show_scores()
+    else:
+        main()

@@ -2,4 +2,6 @@
 .venv/
 __pycache__/
 faiss_index/
-data/.pytest_cache/
+data/
+.pytest_cache/
+evaluation/results.json

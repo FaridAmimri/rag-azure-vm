@@ -5,6 +5,7 @@ Run (venv activated):  python rag.py "your question"
 Needs: faiss_index/ built by ingest.py, MISTRAL_API_KEY in .env
 """
 import os
+import re
 import sys
 from pathlib import Path
 
@@ -21,6 +22,7 @@ INDEX_DIR = Path("faiss_index")
 EMBED_MODEL = "mistral-embed"        # must be the same model as in ingest.py
 CHAT_MODEL = "mistral-small-latest"
 TOP_K = 4                            # number of chunks given to the LLM
+MAX_DISTANCE = 0.45                  # drop chunks farther than this (None = keep all)
 TEMPERATURE = 0.0                    # 0 = stable answers, no creativity
 NO_ANSWER = "I don't know, the documentation I have does not cover this."
 
@@ -40,13 +42,13 @@ PROMPT = ChatPromptTemplate.from_messages([
 # ---------------------------------------------------------------------------
 # 1. Load the index (once) and build the chain (once)
 # ---------------------------------------------------------------------------
-_retriever = None
+_vectorstore = None
 _chain = None
 
 
 def get_components():
-    """Create the retriever and the LLM chain on first call, then reuse them."""
-    global _retriever, _chain
+    """Create the vector store and the LLM chain on first call, then reuse them."""
+    global _vectorstore, _chain
     if _chain is None:
         load_dotenv()
         if not os.getenv("MISTRAL_API_KEY"):
@@ -55,23 +57,33 @@ def get_components():
             raise SystemExit(f"{INDEX_DIR}/ not found: run python ingest.py first")
 
         embeddings = MistralAIEmbeddings(model=EMBED_MODEL)
-        vectorstore = FAISS.load_local(
+        _vectorstore = FAISS.load_local(
             str(INDEX_DIR),
             embeddings,
             # index.pkl is a pickle file: only OK because we created it ourselves
             allow_dangerous_deserialization=True,
         )
-        _retriever = vectorstore.as_retriever(search_kwargs={"k": TOP_K})
 
         llm = ChatMistralAI(model=CHAT_MODEL, temperature=TEMPERATURE)
         # LCEL: the "|" pipes the output of one step into the next
         _chain = PROMPT | llm | StrOutputParser()
-    return _retriever, _chain
+    return _vectorstore, _chain
 
 
 # ---------------------------------------------------------------------------
-# 2. Helpers: format the chunks for the prompt, list unique sources
+# 2. Helpers: search the chunks, format them for the prompt, list unique sources
 # ---------------------------------------------------------------------------
+def search(vectorstore, question):
+    """Top-k chunks with their distance to the question (lower = closer)."""
+    return vectorstore.similarity_search_with_score(question, k=TOP_K)
+
+
+def retrieve(vectorstore, question):
+    """Top-k chunks, without the ones farther than MAX_DISTANCE."""
+    return [doc for doc, distance in search(vectorstore, question)
+            if MAX_DISTANCE is None or distance <= MAX_DISTANCE]
+
+
 def format_context(docs):
     parts = []
     for i, doc in enumerate(docs, start=1):
@@ -96,12 +108,23 @@ def unique_sources(docs):
     return sources
 
 
+def cited_docs(answer, docs):
+    """Chunks the answer cites as [1], [2] or [1, 3]; all chunks if it cites none."""
+    numbers = set()
+    for group in re.findall(r"\[([\d,\s]+)\]", answer):
+        numbers.update(int(n) for n in re.findall(r"\d+", group))
+    cited = [doc for i, doc in enumerate(docs, start=1) if i in numbers]
+    return cited or docs
+
+
 # ---------------------------------------------------------------------------
 # 3. Main function: question -> answer + sources (reused by the API in step 9)
 # ---------------------------------------------------------------------------
 def ask(question):
-    retriever, chain = get_components()
-    docs = retriever.invoke(question)                # top-k chunks from FAISS
+    vectorstore, chain = get_components()
+    docs = retrieve(vectorstore, question)           # top-k chunks from FAISS
+    if not docs:                                     # nothing close enough: skip the LLM call
+        return {"answer": NO_ANSWER, "sources": []}
     answer = chain.invoke({
         "context": format_context(docs),
         "question": question,
@@ -109,7 +132,7 @@ def ask(question):
     # No sources when the model says the docs don't cover the question
     if answer.strip().startswith("I don't know"):
         return {"answer": answer, "sources": []}
-    return {"answer": answer, "sources": unique_sources(docs)}
+    return {"answer": answer, "sources": unique_sources(cited_docs(answer, docs))}
 
 
 if __name__ == "__main__":
