@@ -1,0 +1,10 @@
+# Files Docker must NOT send to the build (secrets, heavy or useless files)
+.env
+.venv/
+.git/
+data/
+tests/
+evaluation/
+__pycache__/
+.pytest_cache/
+*.pyc
