@@ -5,3 +5,4 @@ faiss_index/
 data/
 .pytest_cache/
 evaluation/results.json
+.vscode/
