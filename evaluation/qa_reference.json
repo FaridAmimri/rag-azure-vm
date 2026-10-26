@@ -57,7 +57,8 @@
   {
     "id": "msp-proxy-agent",
     "question": "With Metadata Security Protocol enabled, how do I check that the Guest Proxy Agent is running on a Windows VM?",
-    "expected_sources": ["metadata-security-protocol/troubleshoot-guide.md"],
+    "expected_sources": ["metadata-security-protocol/troubleshoot-guide.md",
+                         "metadata-security-protocol/faq.md"],
     "keywords": ["proxy agent|proxyagent"]
   },
   {

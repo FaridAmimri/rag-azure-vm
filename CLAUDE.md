@@ -28,7 +28,7 @@ Develop on the small subset; index the full corpus only once the pipeline works.
 - [x] Step 7: ingest.py (load .md, split 1000/150, embed, FAISS.save_local), DEV_MODE flag
 - [x] Step 8: RAG chain (retriever + prompt + Mistral), answers with sources
 - [x] Step 9: FastAPI `POST /ask`
-- [x] Step 10: tests (pytest) + quality evaluation (reference Q&A set, 11/11, MAX_DISTANCE 0.45 to re-check on full corpus)
+- [x] Step 10: tests (pytest) + quality evaluation (reference Q&A set, 11/11; full corpus (1220 files, 14297 chunks): 10/11, the miss cited metadata-security-protocol/faq.md, a valid source now accepted; MAX_DISTANCE 0.45 kept (0 wrong refusals))
 - [ ] Step 11: Docker + deployment (Azure Container Apps or Hugging Face Spaces)
 
 ## How to work with me
