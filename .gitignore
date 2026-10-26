@@ -1,7 +1,7 @@
 .env
 .venv/
 __pycache__/
-faiss_index/
+faiss_index*/
 data/
 .pytest_cache/
 evaluation/results.json

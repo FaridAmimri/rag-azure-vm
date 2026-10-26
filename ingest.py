@@ -1,11 +1,13 @@
 """
 ingest.py - Build the FAISS index from the Azure VM Markdown docs.
 
-Run (venv activated):  python ingest.py
+Run (venv activated):  python ingest.py          (dev subset: 14 files)
+                       python ingest.py --full   (full corpus: ~1220 files)
 Output: faiss_index/index.faiss + faiss_index/index.pkl
 """
 import os
 import re
+import sys
 import time
 from pathlib import Path
 
@@ -18,7 +20,8 @@ from langchain_text_splitters import Language, RecursiveCharacterTextSplitter
 # ---------------------------------------------------------------------------
 # Config
 # ---------------------------------------------------------------------------
-DEV_MODE = True                      # True = only the 14 *troubleshoot* files
+# Dev subset by default (only the 14 *troubleshoot* files), full corpus with --full
+DEV_MODE = "--full" not in sys.argv
 DATA_DIR = Path("data/virtual-machines")
 INDEX_DIR = Path("faiss_index")
 CHUNK_SIZE = 1000                    # max characters per chunk
