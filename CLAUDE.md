@@ -29,7 +29,8 @@ Develop on the small subset; index the full corpus only once the pipeline works.
 - [x] Step 8: RAG chain (retriever + prompt + Mistral), answers with sources
 - [x] Step 9: FastAPI `POST /ask`
 - [x] Step 10: tests (pytest) + quality evaluation (reference Q&A set, 11/11; full corpus (1220 files, 14297 chunks): 10/11, the miss cited metadata-security-protocol/faq.md, a valid source now accepted; MAX_DISTANCE 0.45 kept (0 wrong refusals))
-- [ ] Step 11: Docker + deployment (Azure Container Apps or Hugging Face Spaces)
+- [x] Step 11: Docker + deployment on Azure Container Apps (image `ghcr.io/faridamimri/rag-azure-vm:v1`, app `rag-azure-vm` in `rg-rag-azure-vm` / env `env-rag-azure-vm`, francecentral, 0.5 vCPU / 1 GiB, 0-1 replicas, secrets `mistral-api-key` + `api-key`, `POST /ask` needs `X-API-Key`)
+  URL: https://rag-azure-vm.proudsea-0a9f34b1.francecentral.azurecontainerapps.io
 
 ## How to work with me
 - I'm new to Python (I know Node.js / JavaScript): explain each step briefly, with JS equivalents when useful.
