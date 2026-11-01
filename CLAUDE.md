@@ -34,9 +34,11 @@ Develop on the small subset; index the full corpus only once the pipeline works.
 - [x] Step 10: tests (pytest) + quality evaluation (reference Q&A set, 11/11; full corpus (1220 files, 14297 chunks): 10/11, the miss cited metadata-security-protocol/faq.md, a valid source now accepted; MAX_DISTANCE 0.45 kept (0 wrong refusals))
 - [x] Step 11: Docker + deployment on Azure Container Apps (image `ghcr.io/faridamimri/rag-azure-vm:v2`, app `rag-azure-vm` in `rg-rag-azure-vm` / env `env-rag-azure-vm`, francecentral, 0.5 vCPU / 1 GiB, 0-1 replicas, secrets `mistral-api-key` + `api-key`, `POST /ask` needs `X-API-Key`)
   URL: https://rag-azure-vm.proudsea-0a9f34b1.francecentral.azurecontainerapps.io
-- [x] Web interface (local only): search page, answers in Markdown, source links, example questions, light/dark toggle, favicon
+- [x] Web interface: search page, answers in Markdown, source links, example questions, light/dark toggle, favicon
 - [x] French questions: `rag.py` translates the question into English for the search and answers in the question's language (reference set with French questions: 16/16). A rewrite that shortened questions scored 11/16, so it stays a faithful translation
-- [ ] Deploy the web interface (Vercel or a second Container App), with access protection to preserve the Mistral budget
+- [x] Web interface deployed on Azure Container Apps (image `ghcr.io/faridamimri/rag-azure-vm-web:v1`, public package, app `rag-azure-vm-web` in `rg-rag-azure-vm` / env `env-rag-azure-vm`, 0.25 vCPU / 0.5 GiB, 0-1 replicas, env var `RAG_API_URL`, secret `rag-api-key`)
+  URL: https://rag-azure-vm-web.proudsea-0a9f34b1.francecentral.azurecontainerapps.io
+  Open to anyone on purpose, so people can test it: no question limit, only the Mistral overage cap protects the budget. Microsoft Entra login is configured (single-tenant app registration `rag-azure-vm-web`, client secret expires after 2 years) but disabled. To turn it back on: `az containerapp auth update --name rag-azure-vm-web --resource-group rg-rag-azure-vm --enabled true --action RedirectToLoginPage`
 
 ## How to work with me
 - I'm new to Python (I know Node.js / JavaScript): explain each step briefly, with JS equivalents when useful.
