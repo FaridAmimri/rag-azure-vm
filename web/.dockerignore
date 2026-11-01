@@ -1,0 +1,11 @@
+# Files Docker must NOT send to the build (secrets, heavy or useless files)
+.env*
+node_modules/
+.next/
+.git/
+Dockerfile
+.dockerignore
+README.md
+AGENTS.md
+*.tsbuildinfo
+next-env.d.ts
