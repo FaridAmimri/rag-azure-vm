@@ -72,5 +72,42 @@
     "question": "How do I install an NGINX ingress controller on an AKS cluster?",
     "expected_sources": [],
     "keywords": []
+  },
+  {
+    "id": "restore-point-sas-fr",
+    "question": "Comment corriger l'erreur DiskRestorePointUsedByCustomer quand je supprime un point de restauration ?",
+    "expected_sources": ["restore-point-troubleshooting.md"],
+    "keywords": ["shared access|sas"]
+  },
+  {
+    "id": "hibernate-check-fr",
+    "question": "Je n'arrive pas à mettre ma VM en veille prolongée. Que dois-je vérifier en premier ?",
+    "expected_sources": [
+      "hibernate-resume-troubleshooting.md",
+      "windows/hibernate-resume-troubleshooting-windows.md",
+      "linux/hibernate-resume-troubleshooting-linux.md"
+    ],
+    "keywords": ["enabled|activ"]
+  },
+  {
+    "id": "extension-failed-fr",
+    "question": "Une extension a échoué sur ma VM Windows. Que dois-je vérifier en premier ?",
+    "expected_sources": [
+      "extensions/troubleshoot.md",
+      "includes/virtual-machines-common-extensions-troubleshoot.md"
+    ],
+    "keywords": ["agent"]
+  },
+  {
+    "id": "out-of-scope-sql-price-fr",
+    "question": "Quel est le prix mensuel d'une base de données Azure SQL ?",
+    "expected_sources": [],
+    "keywords": []
+  },
+  {
+    "id": "out-of-scope-aks-ingress-fr",
+    "question": "Comment installer un contrôleur d'entrée NGINX sur un cluster AKS ?",
+    "expected_sources": [],
+    "keywords": []
   }
 ]

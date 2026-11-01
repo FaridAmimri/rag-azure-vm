@@ -46,8 +46,54 @@ def test_ask_refuses_without_llm_when_nothing_is_close(monkeypatch):
 
     monkeypatch.setattr(rag, "MAX_DISTANCE", 0.1)
     monkeypatch.setattr(rag, "get_components", lambda: (STORE, FakeChain()))
+    monkeypatch.setattr(rag, "to_search_query", lambda question: question)
     result = rag.ask("What is the price of Azure SQL?")
     assert result == {"answer": rag.NO_ANSWER, "sources": []}
+
+
+class RecordingChain:
+    """Fake LLM chain: remembers what it received and returns a fixed text."""
+
+    def __init__(self, output):
+        self.output = output
+        self.received = None
+
+    def invoke(self, inputs):
+        self.received = inputs
+        return self.output
+
+
+class RecordingStore(FakeVectorStore):
+    """Fake vector store that remembers the text it was asked to search."""
+
+    def similarity_search_with_score(self, question, k):
+        self.query = question
+        return super().similarity_search_with_score(question, k)
+
+
+def test_ask_searches_in_english_but_answers_the_original_question(monkeypatch):
+    store = RecordingStore([(make_doc("close.md"), 0.30)])
+    chain = RecordingChain("Redimensionnez la VM [1].")
+    monkeypatch.setattr(rag, "get_components", lambda: (store, chain))
+    monkeypatch.setattr(rag, "to_search_query", lambda question: "resize a VM")
+
+    result = rag.ask("Comment redimensionner une VM ?")
+
+    assert store.query == "resize a VM"
+    assert chain.received["question"] == "Comment redimensionner une VM ?"
+    assert result["answer"] == "Redimensionnez la VM [1]."
+
+
+def test_to_search_query_uses_the_llm_output(monkeypatch):
+    monkeypatch.setattr(rag, "get_components", lambda: None)
+    monkeypatch.setattr(rag, "_search_chain", RecordingChain("  resize a VM\n"))
+    assert rag.to_search_query("Comment redimensionner une VM ?") == "resize a VM"
+
+
+def test_to_search_query_falls_back_on_the_question(monkeypatch):
+    monkeypatch.setattr(rag, "get_components", lambda: None)
+    monkeypatch.setattr(rag, "_search_chain", RecordingChain("   "))
+    assert rag.to_search_query("Comment redimensionner ?") == "Comment redimensionner ?"
 
 
 DOCS = [make_doc("a.md"), make_doc("b.md"), make_doc("c.md")]
