@@ -6,14 +6,14 @@ Run (venv activated):  python evaluate.py
 Input:  evaluation/qa_reference.json  (questions + expected sources + keywords)
 Output: evaluation/results.json       (detail per question + summary)
 
-Calls the real Mistral API: about 1 embedding + 1 chat call per question.
+Calls the real Mistral API: about 1 embedding + 2 chat calls per question.
 """
 import json
 import sys
 import time
 from pathlib import Path
 
-from rag import ask, get_components, search
+from rag import ask, get_components, search, to_search_query
 
 REFERENCE_FILE = Path("evaluation/qa_reference.json")
 RESULTS_FILE = Path("evaluation/results.json")
@@ -118,8 +118,9 @@ def show_scores():
     items = json.loads(REFERENCE_FILE.read_text(encoding="utf-8"))
     vectorstore, _ = get_components()
     for item in items:
-        print(f"\n{item['id']}")
-        for doc, distance in search(vectorstore, item["question"]):
+        query = to_search_query(item["question"])
+        print(f"\n{item['id']}  (query: {query})")
+        for doc, distance in search(vectorstore, query):
             mark = "OK" if doc.metadata["source"] in item["expected_sources"] else "--"
             print(f"  {mark}  {distance:.3f}  {doc.metadata['source']}")
 

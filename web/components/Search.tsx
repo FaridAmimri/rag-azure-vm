@@ -7,9 +7,9 @@ import type { AskResponse, ErrorResponse } from "@/lib/types";
 import styles from "./Search.module.css";
 
 const EXAMPLES = [
-  "How do I resize a VM?",
-  "How do I create a restore point?",
-  "How do I troubleshoot a VM that fails to start?",
+  "Comment redimensionner une VM ?",
+  "Comment créer un point de restauration ?",
+  "Ma VM Linux ne démarre pas, comment la dépanner ?",
 ];
 
 export default function Search() {

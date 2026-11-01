@@ -33,8 +33,23 @@ PROMPT = ChatPromptTemplate.from_messages([
      "If the context does not contain the answer, say exactly: "
      f"\"{NO_ANSWER}\"\n"
      "Be concise and practical (steps, commands). "
+     "Answer in the same language as the question. "
      "Cite the sources you use with their number, like [1] or [2].\n\n"
      "Context:\n{context}"),
+    ("human", "{question}"),
+])
+
+# The docs are in English: a French question is too far from them in the index,
+# so it is translated for the search only (the LLM still answers the original
+# question, in its language). A rewrite that shortens English questions would
+# lose details: evaluate.py measured fewer correct answers with it.
+SEARCH_PROMPT = ChatPromptTemplate.from_messages([
+    ("system",
+     "The user's question may be in French or another language: translate it "
+     "into English, word for word and complete. "
+     "If it is already in English, return it unchanged. "
+     "Keep product names, error codes and commands exactly as written. "
+     "Do not answer the question. Reply with the question only."),
     ("human", "{question}"),
 ])
 
@@ -44,11 +59,12 @@ PROMPT = ChatPromptTemplate.from_messages([
 # ---------------------------------------------------------------------------
 _vectorstore = None
 _chain = None
+_search_chain = None
 
 
 def get_components():
     """Create the vector store and the LLM chain on first call, then reuse them."""
-    global _vectorstore, _chain
+    global _vectorstore, _chain, _search_chain
     if _chain is None:
         load_dotenv()
         if not os.getenv("MISTRAL_API_KEY"):
@@ -67,12 +83,19 @@ def get_components():
         llm = ChatMistralAI(model=CHAT_MODEL, temperature=TEMPERATURE)
         # LCEL: the "|" pipes the output of one step into the next
         _chain = PROMPT | llm | StrOutputParser()
+        _search_chain = SEARCH_PROMPT | llm | StrOutputParser()
     return _vectorstore, _chain
 
 
 # ---------------------------------------------------------------------------
 # 2. Helpers: search the chunks, format them for the prompt, list unique sources
 # ---------------------------------------------------------------------------
+def to_search_query(question):
+    """The question in English, for the search; the question itself if the LLM returns nothing."""
+    get_components()
+    return _search_chain.invoke({"question": question}).strip() or question
+
+
 def search(vectorstore, question):
     """Top-k chunks with their distance to the question (lower = closer)."""
     return vectorstore.similarity_search_with_score(question, k=TOP_K)
@@ -122,7 +145,8 @@ def cited_docs(answer, docs):
 # ---------------------------------------------------------------------------
 def ask(question):
     vectorstore, chain = get_components()
-    docs = retrieve(vectorstore, question)           # top-k chunks from FAISS
+    query = to_search_query(question)                # question in English, for the search
+    docs = retrieve(vectorstore, query)              # top-k chunks from FAISS
     if not docs:                                     # nothing close enough: skip the LLM call
         return {"answer": NO_ANSWER, "sources": []}
     answer = chain.invoke({
